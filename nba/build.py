@@ -23,6 +23,7 @@ The chain (same in the formulas and in value_players() below):
      RK = rank of VORP. PRK = rank among players with the same first position.
 """
 import datetime
+import json
 import statistics
 import sys
 from pathlib import Path
@@ -280,13 +281,14 @@ def build_minutes(wb, players):
             'Proj GP': p['gp'], 'Proj MPG': round(p['min'] / p['gp'], 1),
             '25-26 GP': p['gp25'], '25-26 MPG': round(p['mpg25'], 1) if p['mpg25'] else None,
             'MPG Δ': f'=IF({c["25-26 MPG"]}="","",{c["Proj MPG"]}-{c["25-26 MPG"]})',
+            'Your GP': p.get('yourGp'),
             'Status': p['status'] or None,
             'Return': p['returnDate'],
             'Games Out': f'=IF({c["Return"]}="",0,COUNTIFS(Schedule!$B:$B,{c["Team"]},Schedule!$A:$A,"<"&{c["Return"]}))',
             'Max GP': f'={SEASON_GAMES}-{c["Games Out"]}',
             'GP Used': f'=IF({c["Your GP"]}<>"",{c["Your GP"]},MIN({c["Proj GP"]},{c["Max GP"]}))',
             'MPG Used': f'=IF({c["Your MPG"]}<>"",{c["Your MPG"]},{c["Proj MPG"]})',
-            'Note': p['injuryNote'] or None,
+            'Note': ' · '.join(x for x in (p['injuryNote'], p.get('availabilityNote')) if x) or None,
         }
         for name, v in values.items():
             ws[c[name]] = v
@@ -411,6 +413,8 @@ def build_list(wb, players, valued):
         for name, formula in formulas.items():
             ws[c[name]] = formula
         ws[c['ADJ']].fill = INPUT_FILL
+        if p.get('adj'):
+            ws[c['ADJ']] = p['adj']
 
     fmt = {'VALUE': '0.00', 'VORP': '0.00', 'DIFF': '+0;-0;0', 'MPG': '0.0', 'GP': '0',
            'FG%': '.000', 'FT%': '.000', 'MULT': '0.00', 'BASE': '0.00',
@@ -442,9 +446,36 @@ def build_list(wb, players, valued):
     return last
 
 
+AVAILABILITY = Path(__file__).parent / 'availability.json'
+
+
+def load_availability(players):
+    """Apply availability.json: expected GP and ADJ marks, stored on each player.
+    Returns the (minutes, adj) dicts value_players takes. Unmatched names are reported."""
+    notes = json.loads(AVAILABILITY.read_text(encoding='utf-8'))
+    entries = {**notes.get('booms', {}), **notes.get('fades', {})}
+    names = {p['name'] for p in players}
+    missing = sorted(n for n in entries if n not in names)
+    if missing:
+        print('availability.json: no projection row for ' + ', '.join(missing))
+    minutes, adj = {}, {}
+    for p in players:
+        e = notes.get('fades', {}).get(p['name'], {}) | notes.get('booms', {}).get(p['name'], {})
+        if 'yourGp' in e:
+            minutes[p['name']] = (e['yourGp'], None, None)
+            p['yourGp'] = e['yourGp']
+        if 'adj' in e:
+            adj[p['name']] = e['adj']
+            p['adj'] = e['adj']
+        if e.get('note'):
+            p['availabilityNote'] = e['note']
+    return minutes, adj
+
+
 def main():
     players, schedule = load_players()
-    valued = value_players(players, schedule)
+    minutes, adj = load_availability(players)
+    valued = value_players(players, schedule, adj=adj, minutes=minutes)
     wb = Workbook()
     build_settings(wb)
     last = build_list(wb, players, valued)

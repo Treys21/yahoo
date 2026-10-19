@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NBA Roto Rankings</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0; padding: 16px; background: #101216; color: #e8eaed;
+        font: 13px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --ydr-body-height: calc(100vh - 330px);
+      }
+      main { max-width: 1100px; margin: 0 auto; }
+      header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 10px; }
+      h1 { font-size: 16px; margin: 0; }
+      .muted { color: #9aa0a6; }
+      .small { font-size: 11px; }
+      .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+      button {
+        background: #7e1fff; color: #fff; border: none; border-radius: 6px; padding: 5px 11px;
+        font: inherit; font-size: 12px; cursor: pointer;
+      }
+      button.secondary { background: #24272f; color: #c9cdd4; }
+      button.secondary:hover { background: #2c3038; }
+      .seg { display: inline-flex; border: 1px solid #333842; border-radius: 6px; overflow: hidden; }
+      .seg button { border-radius: 0; background: #24272f; color: #c9cdd4; }
+      .seg button + button { border-left: 1px solid #333842; }
+      .seg button.on { background: #7e1fff; color: #fff; }
+      .ok { color: #4ade80; } .err { color: #f28b82; }
+      #help { max-width: 760px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>NBA Roto Rankings</h1>
+        <span id="summary" class="muted small"></span>
+      </header>
+
+      <div class="bar">
+        <span class="muted small">✕ marks a player as</span>
+        <span class="seg" id="mark-mode">
+          <button data-mode="taken" title="Drafted by another team">taken</button>
+          <button data-mode="mine" title="On your team: recommendations, outlook and starts follow your roster">mine</button>
+        </span>
+        <button class="secondary" id="clear">Clear marks</button>
+        <button class="secondary" id="import">Open another workbook…</button>
+        <input id="import-file" type="file" accept=".xlsx" hidden />
+        <span id="status" class="small"></span>
+      </div>
+
+      <div id="board"></div>
+
+      <p id="help" class="muted small">
+        Offline: nothing here talks to Yahoo. Sort by any column; ⚙ Settings punts categories or switches games
+        played. Mark players <b>taken</b> or <b>mine</b> to practice a draft — Gain, Starts and the outlook update for
+        your roster. To pick up edits to the workbook, save it in Excel and run <code>npm run viewer</code>, or use
+        “Open another workbook…”.
+      </p>
+    </main>
+
+    <script src="../../src/lib/dom.js"></script>
+    <script src="../../src/lib/match-names.js"></script>
+    <script src="../../src/lib/xlsx-reader.js"></script>
+    <script src="storage.js"></script>
+    <script src="../../src/nba/model.js"></script>
+    <script src="../../src/nba/workbook.js"></script>
+    <script src="../../src/nba/recommend.js"></script>
+    <script src="../../src/nba/board.js"></script>
+    <script src="../../src/nba/panel.js"></script>
+    <script src="data.js"></script>
+    <script src="viewer.js"></script>
+  </body>
+</html>

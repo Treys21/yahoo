@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>NHL Draft Board</h1>
+      <span id="summary" class="muted small">No spreadsheet imported yet.</span>
+      <button id="open-nba" class="secondary" style="margin-left:auto">NBA board →</button>
+    </header>
+
+    <section class="toolbar">
+      <button id="import">Import .xlsx</button>
+      <button id="open-tab" class="secondary" hidden>Open full board in tab</button>
+      <button id="export" class="secondary">Export JSON</button>
+      <button id="reset-overrides" class="secondary" title="Clear players you marked drafted by hand">Clear ✕ marks</button>
+      <input id="import-file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+    </section>
+    <p id="import-status" class="small"></p>
+
+    <div id="board"></div>
+
+    <p class="muted small">
+      The same board floats over Yahoo's live draft page
+      (<b>hockey.fantasysports.yahoo.com/draftclient/…</b>), where drafted players drop off as they're picked.
+      ⚙ settings changed here carry over. Re-import after saving changes in Excel.
+    </p>
+
+    <script src="../lib/storage.js"></script>
+    <script src="../lib/dom.js"></script>
+    <script src="../lib/match-names.js"></script>
+    <script src="../lib/xlsx-reader.js"></script>
+    <script src="../lib/workbook-import.js"></script>
+    <script src="../lib/valuation.js"></script>
+    <script src="../lib/board-rows.js"></script>
+    <script src="../yahoo/panel.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

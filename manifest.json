@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "Yahoo Draft Board Overlay (NHL + NBA)",
+  "version": "1.1.0",
+  "description": "Overlays your own projections on Yahoo's live Fantasy Hockey and Basketball draft rooms, dropping players as they're drafted.",
+  "permissions": ["storage", "unlimitedStorage"],
+  "host_permissions": [
+    "https://hockey.fantasysports.yahoo.com/*",
+    "https://basketball.fantasysports.yahoo.com/*",
+    "https://pub-api.fantasysports.yahoo.com/*"
+  ],
+  "action": {
+    "default_title": "Yahoo Draft Board",
+    "default_popup": "src/popup/popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["nba/2026-27-NBA-Roto-Values.xlsx"],
+      "matches": ["https://basketball.fantasysports.yahoo.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://hockey.fantasysports.yahoo.com/draftclient/*"],
+      "js": ["src/yahoo/ws-hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://hockey.fantasysports.yahoo.com/draftclient/*"],
+      "js": [
+        "src/lib/storage.js",
+        "src/lib/dom.js",
+        "src/lib/match-names.js",
+        "src/lib/draft-protocol.js",
+        "src/lib/yahoo-api.js",
+        "src/lib/valuation.js",
+        "src/lib/board-rows.js",
+        "src/yahoo/panel.js",
+        "src/yahoo/inline-badges.js",
+        "src/yahoo/content.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://basketball.fantasysports.yahoo.com/draftclient/*"],
+      "js": ["src/yahoo/ws-hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://basketball.fantasysports.yahoo.com/draftclient/*"],
+      "js": [
+        "src/lib/storage.js",
+        "src/lib/dom.js",
+        "src/lib/match-names.js",
+        "src/lib/draft-protocol.js",
+        "src/lib/yahoo-api.js",
+        "src/lib/xlsx-reader.js",
+        "src/nba/model.js",
+        "src/nba/workbook.js",
+        "src/nba/recommend.js",
+        "src/nba/board.js",
+        "src/nba/panel.js",
+        "src/nba/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "yahoo-nhl-draft-overlay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome extension overlaying your projections spreadsheet onto the live Yahoo Fantasy Hockey draft room.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "viewer": "node nba/viewer/export.js && echo \"Rankings: http://localhost:8765/nba/viewer/\" && python3 -m http.server 8765 --bind 127.0.0.1",
+    "viewer:export": "node nba/viewer/export.js"
+  }
+}

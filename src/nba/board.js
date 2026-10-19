@@ -19,6 +19,7 @@ globalThis.YDR = globalThis.YDR || {};
       flatGp: s.flatGp,
       gpProjection: o.gpProjection ?? s.gpProjection,
       boosts: o.boosts ?? s.boosts,
+      scoring: o.scoring ?? s.scoring ?? 'roto',
       teams: teams || s.teams
     };
   }
@@ -34,6 +35,7 @@ globalThis.YDR = globalThis.YDR || {};
       if (!Object.keys(next.weights).length) delete next.weights;
     }
     for (const key of ['gpProjection', 'boosts']) if (next[key] === s[key]) delete next[key];
+    if (next.scoring === (s.scoring ?? 'roto')) delete next.scoring;
     return next;
   }
 
@@ -114,6 +116,7 @@ globalThis.YDR = globalThis.YDR || {};
         myTeamId,
         slots: opts.slots,
         weights: opts.weights,
+        scoring: opts.scoring,
         currentPick,
         myPick: ctx.myPick ?? null,
         followingPick: ctx.followingPick ?? null

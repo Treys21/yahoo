@@ -102,7 +102,7 @@ globalThis.YDR = globalThis.YDR || {};
     { key: 'score', label: '#', title: 'Live pick order: standings gain, minus a little for players likely to come back' },
     { key: 'name', label: 'Player', left: true },
     { key: 'pos', label: 'Pos', left: true },
-    { key: 'gain', label: 'Gain', title: 'Expected roto standings points this player adds to your team now' },
+    { key: 'gain', label: 'Gain', title: 'Expected standings points (roto) or matchups won (H2H) this player adds to your team now' },
     { key: 'back', label: 'Back', title: 'Chance he is still there at your following pick (from ADP)' },
     { key: 'gp', label: 'GP', title: 'Projected games (injury-adjusted). INJ = out at the start of the season; hover for the report' },
     { key: 'mpg', label: 'MPG', title: 'Projected minutes per game. ▲/▼ = 3+ minutes more/less than last season' },
@@ -272,15 +272,20 @@ globalThis.YDR = globalThis.YDR || {};
   function renderOutlook(state) {
     const rec = state.rec;
     if (!rec || state.status !== 'ok') return '';
-    const teams = rec.teams;
+    const max = rec.maxPoints;
+    const h2h = rec.scoring === 'h2h';
     const weights = state.options.weights;
     const cats = YDR.nbaModel.CATEGORIES.map((c) => {
       const pts = rec.outlook[c];
       const off = !weights[c];
-      const cls = off ? 'off' : pts >= teams * 0.66 ? 'hi' : pts <= teams * 0.4 ? 'lo' : '';
-      return `<span class="cat ${cls}" title="Expected roto points in ${c} (1–${teams})">${c} <b>${pts.toFixed(1)}</b></span>`;
+      const cls = off ? 'off' : pts >= max * 0.66 ? 'hi' : pts <= max * 0.4 ? 'lo' : '';
+      const unit = h2h ? `matchups won (of ${max})` : `roto points (1–${max})`;
+      return `<span class="cat ${cls}" title="Expected ${unit} in ${c}">${c} <b>${pts.toFixed(1)}</b></span>`;
     }).join('');
-    return `<div class="row"><span title="Your projected roto standings: drafted players plus average picks for open spots">Outlook <b>${rec.total.toFixed(1)}</b></span>${cats}</div>`;
+    const label = h2h
+      ? 'Expected H2H matchups won in each category over the season, against an average opponent'
+      : 'Your projected roto standings: drafted players plus average picks for open spots';
+    return `<div class="row"><span title="${label}">Outlook <b>${rec.total.toFixed(1)}</b></span>${cats}</div>`;
   }
 
   function renderRoster(state) {
@@ -334,6 +339,7 @@ globalThis.YDR = globalThis.YDR || {};
     return `
       <div class="settings">
         <span class="lbl">Categories</span><span class="seg">${cats}</span>
+        ${seg('scoring', 'Scoring', [['roto', 'Roto'], ['h2h', 'H2H categories']])}
         ${seg('gpProjection', 'Games', [[true, 'Projected GP'], [false, `Flat ${o.flatGp}`]])}
         ${seg('boosts', 'Boost / bust', [[true, 'On'], [false, 'Off']])}
         <div class="note">

@@ -162,3 +162,27 @@ test('a mid-draft rebuild with the nightly simulation stays fast', async () => {
   assert.ok(ms < 1500, `${ms}ms`);
   console.log(`rebuild with simulation: ${ms}ms`);
 });
+
+test('H2H: with every team even, each category is worth half the matchups', async () => {
+  const { rows, settings } = await valuedPlayers();
+  const rec = R.recommend(ctx(rows, settings, { scoring: 'h2h' }));
+  assert.equal(rec.scoring, 'h2h');
+  assert.equal(rec.maxPoints, R.H2H_WEEKS);
+  for (const c of YDR.nbaModel.CATEGORIES) assert.ok(Math.abs(rec.outlook[c] - R.H2H_WEEKS / 2) < 1e-6, c);
+});
+
+test('H2H outlook stays within 0..H2H_WEEKS for every category', async () => {
+  const { rows, settings } = await valuedPlayers();
+  const mine = rows.map((r, i) => (i < 9 ? { ...r, teamId: 1 } : r));
+  const rec = R.recommend(ctx(mine, settings, { scoring: 'h2h', currentPick: 40, myPick: 40, followingPick: 60 }));
+  for (const c of YDR.nbaModel.CATEGORIES) {
+    assert.ok(rec.outlook[c] >= 0 && rec.outlook[c] <= R.H2H_WEEKS, `${c}=${rec.outlook[c]}`);
+  }
+});
+
+test('roto stays the default scoring and keeps its points scale', async () => {
+  const { rows, settings } = await valuedPlayers();
+  const rec = R.recommend(ctx(rows, settings));
+  assert.equal(rec.scoring, 'roto');
+  assert.equal(rec.maxPoints, TEAMS.length);
+});

@@ -46,6 +46,12 @@ globalThis.YDR = globalThis.YDR || {};
   const SLOT_CAP = 82; // Yahoo's max games per roster slot
   const GENERIC_GAMES = 72; // an average future pick's games
   const URGENCY = 0.15;
+  // Head-to-head: a season is H2H_WEEKS matchups, each a fresh one-week contest
+  // per category against one opponent. WEEK_NOISE is the per-category luck of a
+  // single week (in z units) on top of the season projection error. Both are
+  // assumptions; scale them if your league's schedule or variance differs.
+  const H2H_WEEKS = 24;
+  const WEEK_NOISE = 0.5;
   const QUEUE_SIZE = 10;
   const ELIGIBLE = { PG: ['PG'], SG: ['SG'], G: ['PG', 'SG'], SF: ['SF'], PF: ['PF'], F: ['SF', 'PF'], C: ['C'] };
 
@@ -227,8 +233,15 @@ globalThis.YDR = globalThis.YDR || {};
 
     const me = strength.get(ctx.myTeamId);
     const others = [...strength].filter(([id]) => id !== ctx.myTeamId).map(([, t]) => t);
-    const expectedPoints = (c, s, varc) =>
-      1 + others.reduce((acc, t) => acc + phi((s - t.s[c]) / Math.sqrt(varc + t.v[c] || 1)), 0);
+    const h2h = ctx.scoring === 'h2h';
+    // Roto: 1 + Σ P(finish ahead of each team) (max = teams).
+    // H2H: expected matchups won in the category over the season against a
+    // random opponent (max = H2H_WEEKS). Each week's result carries WEEK_NOISE.
+    const expectedPoints = h2h
+      ? (c, s, varc) => (H2H_WEEKS / others.length) *
+          others.reduce((acc, t) => acc + phi((s - t.s[c]) / Math.sqrt(varc + t.v[c] + WEEK_NOISE ** 2 || 1)), 0)
+      : (c, s, varc) => 1 + others.reduce((acc, t) => acc + phi((s - t.s[c]) / Math.sqrt(varc + t.v[c] || 1)), 0);
+    const maxPoints = h2h ? H2H_WEEKS : ctx.teamIds.length;
 
     const outlook = {};
     for (const c of cats) outlook[c] = expectedPoints(c, me.s[c], me.v[c]);
@@ -280,11 +293,13 @@ globalThis.YDR = globalThis.YDR || {};
       total: cats.reduce((acc, c) => acc + (weights[c] ?? 1) * outlook[c], 0),
       needs,
       myOpen,
-      teams: ctx.teamIds.length
+      teams: ctx.teamIds.length,
+      scoring: h2h ? 'h2h' : 'roto',
+      maxPoints
     };
   }
 
-  const api = { recommend, starterSlots, openSlots, simulateStarts, phi, PLAYER_NOISE, URGENCY, QUEUE_SIZE, SLOT_CAP };
+  const api = { recommend, starterSlots, openSlots, simulateStarts, phi, PLAYER_NOISE, URGENCY, QUEUE_SIZE, SLOT_CAP, H2H_WEEKS, WEEK_NOISE };
   YDR.nbaRecommend = api;
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

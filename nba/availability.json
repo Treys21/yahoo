@@ -1,38 +1,136 @@
 {
-  "_about": "Preseason availability and form, applied at build time. yourGp = games you expect the player to play this season (Minutes & Health 'Your GP'). adj = ADJ boost mark ('+ + +' .. '- - -', multiplies production). Estimates from preseason reporting, Oct 19 2026: update as news changes and rerun build.py.",
+  "_about": "Preseason availability and form, applied at build time. yourGp = games you expect the player to play this season (Minutes & Health 'Your GP'). adj = ADJ boost mark ('+ + +' .. '- - -', multiplies production). Estimates from preseason reporting. Update as news changes and rerun build.py.",
+  "updated": "2026-10-19",
+  "sport": "NBA",
+  "markersLegend": "ADJ marks: + + + / + + / + boost production; - / - - / - - - cut it. Applies to NBA players only.",
   "fades": {
-    "Anthony Davis": {"yourGp": 60, "note": "Missed 14+ games in 10 of 14 seasons; WAS usage shared with Young/Dybantsa"},
-    "LeBron James": {"yourGp": 60, "note": "Turns 42; played 60 games last season; PHI fourth option"},
-    "Kawhi Leonard": {"yourGp": 60, "note": "Has not played 70+ games since 2017"},
-    "Joel Embiid": {"yourGp": 50, "note": "Rusty in preseason, 8 turnovers in one game; injury history"},
-    "Kristaps Porzingis": {"yourGp": 40, "note": "Unknown illness, not at camp, out indefinitely"},
-    "Brandon Ingram": {"yourGp": 20, "note": "Partially torn Achilles, no timetable", "adj": "- -"},
-    "Walker Kessler": {"yourGp": 55, "note": "Finger injury, has not debuted"},
-    "Mark Williams": {"yourGp": 25, "note": "Out until at least February (shoulder surgery)"},
-    "Jusuf Nurkic": {"yourGp": 70, "note": "Plantar plate tear, out about a month"},
-    "Nic Claxton": {"yourGp": 55, "note": "Hamstring, unlikely for opening night"},
-    "Coby White": {"yourGp": 65, "note": "Calf strain, out all preseason"},
-    "Zion Williamson": {"yourGp": 50, "note": "Not expected to exceed 50 games; no 3PM", "adj": "-"},
-    "De'Aaron Fox": {"adj": "-", "note": "Role shared with Harper and Castle; trade risk"},
-    "Ja Morant": {"adj": "- -", "note": "Rusty; crowded POR backcourt; 3PM poor"},
-    "VJ Edgecombe": {"adj": "-", "note": "Role change with LeBron and Brown arrivals (ESPN fade)"},
-    "Kon Knueppel": {"yourGp": 65, "note": "Hamstring strain, GM unsure of opener"},
-    "Jakob Poeltl": {"adj": "-", "note": "Murray-Boyles could cut into minutes"}
+    "Anthony Davis": {
+      "yourGp": 60,
+      "note": "Missed 14+ games in 10 of 14 seasons; WAS usage shared with Young/Dybantsa"
+    },
+    "LeBron James": {
+      "yourGp": 60,
+      "note": "Turns 42; played 60 games last season; PHI fourth option"
+    },
+    "Kawhi Leonard": {
+      "yourGp": 60,
+      "note": "Has not played 70+ games since 2017"
+    },
+    "Joel Embiid": {
+      "yourGp": 50,
+      "note": "Rusty in preseason, 8 turnovers in one game; injury history"
+    },
+    "Kristaps Porzingis": {
+      "yourGp": 40,
+      "note": "Unknown illness, not at camp, out indefinitely"
+    },
+    "Brandon Ingram": {
+      "yourGp": 20,
+      "note": "Partially torn Achilles, no timetable",
+      "adj": "- -"
+    },
+    "Walker Kessler": {
+      "yourGp": 55,
+      "note": "Finger injury, has not debuted"
+    },
+    "Mark Williams": {
+      "yourGp": 25,
+      "note": "Out until at least February (shoulder surgery)"
+    },
+    "Jusuf Nurkic": {
+      "yourGp": 70,
+      "note": "Plantar plate tear, out about a month"
+    },
+    "Nic Claxton": {
+      "yourGp": 55,
+      "note": "Hamstring, unlikely for opening night"
+    },
+    "Coby White": {
+      "yourGp": 65,
+      "note": "Calf strain, out all preseason"
+    },
+    "Zion Williamson": {
+      "yourGp": 50,
+      "note": "Not expected to exceed 50 games; no 3PM",
+      "adj": "-"
+    },
+    "De'Aaron Fox": {
+      "adj": "-",
+      "note": "Role shared with Harper and Castle; trade risk"
+    },
+    "Ja Morant": {
+      "adj": "- -",
+      "note": "Rusty; crowded POR backcourt; 3PM poor"
+    },
+    "VJ Edgecombe": {
+      "adj": "-",
+      "note": "Role change with LeBron and Brown arrivals (ESPN fade)"
+    },
+    "Kon Knueppel": {
+      "yourGp": 65,
+      "note": "Hamstring strain, GM unsure of opener"
+    },
+    "Jakob Poeltl": {
+      "adj": "-",
+      "note": "Murray-Boyles could cut into minutes"
+    }
   },
   "booms": {
-    "Ryan Rollins": {"adj": "+ +", "note": "Starting PG after the Giannis trade"},
-    "Ausar Thompson": {"adj": "+ +", "note": "Signed long-term; minutes up"},
-    "Caleb Wilson": {"adj": "+ +", "note": "Expected 30+ minutes at PF"},
-    "Cedric Coward": {"adj": "+ +", "note": "Year-two step forward, starting guard"},
-    "Darius Acuff Jr.": {"adj": "+ +", "note": "No. 7 pick, 30+ minutes in SAC backcourt"},
-    "Kel'el Ware": {"adj": "+ +", "note": "Producing in blocks, threes, FG%"},
-    "Fred VanVleet": {"adj": "+ +", "note": "Strong return from ACL: 17 pts, 7 ast, 5 threes"},
-    "Dejounte Murray": {"adj": "+", "note": "Healthy after Achilles, ADP climbing"},
-    "Anthony Black": {"adj": "+", "note": "Path to 25+ minutes in ORL"},
-    "Cason Wallace": {"adj": "+", "note": "Confirmed OKC starter"},
-    "Egor Demin": {"adj": "+", "note": "Five assists in both preseason games"},
-    "Cameron Boozer": {"adj": "+", "note": "24% early usage, mid-round target"},
-    "Dereck Lively II": {"adj": "+", "note": "Minutes if healthy; shares with Gafford"},
-    "Immanuel Quickley": {"adj": "+", "note": "Role least hit by Kawhi arrival"}
+    "Ryan Rollins": {
+      "adj": "+ +",
+      "note": "Starting PG after the Giannis trade"
+    },
+    "Ausar Thompson": {
+      "adj": "+ +",
+      "note": "Signed long-term; minutes up"
+    },
+    "Caleb Wilson": {
+      "adj": "+ +",
+      "note": "Expected 30+ minutes at PF"
+    },
+    "Cedric Coward": {
+      "adj": "+ +",
+      "note": "Year-two step forward, starting guard"
+    },
+    "Darius Acuff Jr.": {
+      "adj": "+ +",
+      "note": "No. 7 pick, 30+ minutes in SAC backcourt"
+    },
+    "Kel'el Ware": {
+      "adj": "+ +",
+      "note": "Producing in blocks, threes, FG%"
+    },
+    "Fred VanVleet": {
+      "adj": "+ +",
+      "note": "Strong return from ACL: 17 pts, 7 ast, 5 threes"
+    },
+    "Dejounte Murray": {
+      "adj": "+",
+      "note": "Healthy after Achilles, ADP climbing"
+    },
+    "Anthony Black": {
+      "adj": "+",
+      "note": "Path to 25+ minutes in ORL"
+    },
+    "Cason Wallace": {
+      "adj": "+",
+      "note": "Confirmed OKC starter"
+    },
+    "Egor Demin": {
+      "adj": "+",
+      "note": "Five assists in both preseason games"
+    },
+    "Cameron Boozer": {
+      "adj": "+",
+      "note": "24% early usage, mid-round target"
+    },
+    "Dereck Lively II": {
+      "adj": "+",
+      "note": "Minutes if healthy; shares with Gafford"
+    },
+    "Immanuel Quickley": {
+      "adj": "+",
+      "note": "Role least hit by Kawhi arrival"
+    }
   }
 }

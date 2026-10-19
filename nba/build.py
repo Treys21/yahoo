@@ -453,6 +453,9 @@ def load_availability(players):
     """Apply availability.json: expected GP and ADJ marks, stored on each player.
     Returns the (minutes, adj) dicts value_players takes. Unmatched names are reported."""
     notes = json.loads(AVAILABILITY.read_text(encoding='utf-8'))
+    if notes.get('sport') != 'NBA':
+        raise SystemExit('availability.json is not an NBA file')
+    print(f"availability as of {notes.get('updated', 'unknown')}")
     entries = {**notes.get('booms', {}), **notes.get('fades', {})}
     names = {p['name'] for p in players}
     missing = sorted(n for n in entries if n not in names)

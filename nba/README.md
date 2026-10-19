@@ -100,3 +100,15 @@ to practice a draft: Gain, Starts and the outlook follow your roster. Marks
 and settings are kept in the browser. After editing the workbook, save it in
 Excel and run `npm run viewer` again. `npm run viewer:export` only rewrites
 `nba/viewer/data.js`; `nba/viewer/index.html` also opens straight from disk.
+
+## Availability markers (NBA only)
+
+`nba/availability.json` holds the preseason markers, dated in its `updated` field
+(currently 2026-10-19). The build prints that date and refuses any file not marked
+`"sport": "NBA"`, so NHL data can't be pulled in.
+
+- **Your GP** cuts expected games for injured or unavailable players.
+- **ADJ** marks are boost/bust: `+ + +` `+ +` `+` raise production, `-` `- -` `- - -` lower it.
+
+The hockey colour markers (SOS, age, salary, TOI, power play) belong to the NHL board
+and do not appear on the NBA board.

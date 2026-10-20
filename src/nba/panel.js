@@ -145,6 +145,8 @@ globalThis.YDR = globalThis.YDR || {};
       document.documentElement.appendChild(host);
       shadow = host.attachShadow({ mode: 'open' });
     }
+    // Always on for now: start expanded on every load, even if it was collapsed last time.
+    ui.collapsed = false;
     YDR.dom.applyStyles(shadow, CSS);
     const panel = document.createElement('div');
     panel.className = inline ? 'panel inline' : 'panel';

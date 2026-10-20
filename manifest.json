@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Yahoo Draft Board Overlay (NHL + NBA)",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Overlays your own projections on Yahoo's live Fantasy Hockey and Basketball draft rooms, dropping players as they're drafted.",
   "permissions": ["storage", "unlimitedStorage"],
   "host_permissions": [

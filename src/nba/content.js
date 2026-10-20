@@ -13,9 +13,16 @@
   // Bump when the bundled workbook changes, so a stored copy of an older one is replaced.
   const BUNDLE_VERSION = 2;
 
-  const route = YDR.yahoo.parseDraftRoute(location.href);
-  if (!route || route.game !== 'nba') return;
-  log('draft room', route);
+  // Always on: league pages (/nba/<leagueId>/<teamId>/...) get the same board
+  // before the draft room opens, just without live picks.
+  function leaguePage(href) {
+    const match = String(href).match(/\/nba\/(\d+)(?:\/(\d+))?/);
+    return { game: 'nba', draftId: match ? match[1] : 'league', teamId: match && match[2] ? parseInt(match[2], 10) : 0, preDraft: true };
+  }
+
+  const route = YDR.yahoo.parseDraftRoute(location.href) || leaguePage(location.href);
+  if (route.game !== 'nba') return;
+  log(route.preDraft ? 'league page' : 'draft room', route);
 
   const draft = YDR.protocol.createState();
   const boardState = YDR.nbaBoard.createBoard();
@@ -82,6 +89,9 @@
     // Per draft: queue sync is opted into for one draft room at a time and starts off everywhere else.
     syncEnabled = Boolean((await YDR.storage.get('nbaQueueSyncByDraft', {}))[route.draftId]);
 
+    // League pages have no draft to track, so skip linking to Yahoo's draft player pool.
+    if (route.preDraft) return;
+
     let yahooPlayers = [];
     try {
       yahooPlayers = await YDR.yahoo.getPlayers(route);
@@ -114,11 +124,11 @@
     const currentPick = draft.onClock?.pickNo || draft.picks.size + 1;
     const myTurn = Boolean(draft.onClock && draft.onClock.teamId === route.teamId && !draft.over);
     // Before the draft starts there is no order yet: your slot is your round-one pick, so assume slot order.
-    const assumed = order.length ? null : Array.from({ length: teams }, (_, i) => i + 1);
+    const assumed = order.length || route.preDraft ? null : Array.from({ length: teams }, (_, i) => i + 1);
     const myPick = myTurn ? currentPick : YDR.protocol.nextPickFor(draft, route.teamId, currentPick, teams, assumed);
     const followingPick = myPick ? YDR.protocol.nextPickFor(draft, route.teamId, myPick + 1, teams, assumed) : null;
     return {
-      links, yahooById, manual,
+      links: route.preDraft ? undefined : links, yahooById, manual,
       picks: draft.picks.values(),
       myTeamId: route.teamId,
       teamIds: order.length ? order : null,
@@ -158,7 +168,7 @@
     let picksAway = null;
     if (!ctx.myTurn && ctx.myPick && draft.onClock) picksAway = ctx.myPick - ctx.currentPick;
     const round = ctx.teams ? `rd ${Math.ceil(ctx.currentPick / ctx.teams)} · ` : '';
-    const message = loadError || (draft.over ? `complete · ${draft.picks.size} picks`
+    const message = loadError || (route.preDraft ? 'pre-draft · open the draft room for live picks' : draft.over ? `complete · ${draft.picks.size} picks`
       : draft.onClock ? `${round}pick ${ctx.currentPick}` : draft.picks.size ? `${draft.picks.size} picks` : 'waiting for draft');
 
     YDR.nbaPanel.render({

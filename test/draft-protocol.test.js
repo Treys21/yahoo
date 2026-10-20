@@ -101,3 +101,18 @@ test('the R frame lists the team for every pick (as Yahoo sends it)', () => {
   assert.equal(P.nextPickFor(state, 5, 145, 12), 149);
   assert.equal(P.nextPickFor(state, 5, 150, 12), null);
 });
+
+test('before the draft starts, the slot order stands in for your picks', () => {
+  const P = require('../src/lib/draft-protocol.js');
+  const empty = P.createState();
+  const assumed = Array.from({ length: 12 }, (_, i) => i + 1);
+  // Slot 5 in a 12-team snake: picks 5, 20, 29, 44, ...
+  assert.equal(P.nextPickFor(empty, 5, 1, 12, assumed), 5);
+  assert.equal(P.nextPickFor(empty, 5, 6, 12, assumed), 20);
+  assert.equal(P.nextPickFor(empty, 5, 21, 12, assumed), 29);
+  // Slot 11 in a 12-team snake: picks 11, 14, 23, 26, ...
+  assert.equal(P.nextPickFor(empty, 11, 1, 12, assumed), 11);
+  assert.equal(P.nextPickFor(empty, 11, 12, 12, assumed), 14);
+  // Without an assumed order, nothing is known yet.
+  assert.equal(P.nextPickFor(empty, 5, 1, 12), null);
+});

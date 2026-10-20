@@ -21,6 +21,7 @@
   const boardState = YDR.nbaBoard.createBoard();
   let board = null;
   let overrides = {};
+  let scoringByDraft = {}; // draftId -> 'roto' | 'h2h', so each league keeps its own format
   let manual = new Set();
   let links = new Map();
   let yahooById = new Map();
@@ -76,6 +77,7 @@
       }
     }
     overrides = await YDR.storage.get('nbaOptions', {});
+    scoringByDraft = await YDR.storage.get('nbaScoringByDraft', {});
     manual = new Set((await YDR.storage.get('nbaOverrides', {}))[route.draftId] || []);
     // Per draft: queue sync is opted into for one draft room at a time and starts off everywhere else.
     syncEnabled = Boolean((await YDR.storage.get('nbaQueueSyncByDraft', {}))[route.draftId]);
@@ -111,8 +113,10 @@
     const teams = order.length || board.settings.teams;
     const currentPick = draft.onClock?.pickNo || draft.picks.size + 1;
     const myTurn = Boolean(draft.onClock && draft.onClock.teamId === route.teamId && !draft.over);
-    const myPick = myTurn ? currentPick : YDR.protocol.nextPickFor(draft, route.teamId, currentPick, teams);
-    const followingPick = myPick ? YDR.protocol.nextPickFor(draft, route.teamId, myPick + 1, teams) : null;
+    // Before the draft starts there is no order yet: your slot is your round-one pick, so assume slot order.
+    const assumed = order.length ? null : Array.from({ length: teams }, (_, i) => i + 1);
+    const myPick = myTurn ? currentPick : YDR.protocol.nextPickFor(draft, route.teamId, currentPick, teams, assumed);
+    const followingPick = myPick ? YDR.protocol.nextPickFor(draft, route.teamId, myPick + 1, teams, assumed) : null;
     return {
       links, yahooById, manual,
       picks: draft.picks.values(),
@@ -148,7 +152,7 @@
       return;
     }
     const ctx = draftContext();
-    const built = boardState.build(board, overrides, ctx);
+    const built = boardState.build(board, effectiveOverrides(), ctx);
     syncQueue(built.queueYahooIds, built.rec.myOpen);
 
     let picksAway = null;
@@ -181,6 +185,12 @@
 
   // ------------------------------------------------------------ actions
 
+  // This room's own scoring format wins over the global setting.
+  function effectiveOverrides() {
+    const scoring = scoringByDraft[route.draftId];
+    return scoring ? Object.assign({}, overrides, { scoring }) : overrides;
+  }
+
   async function saveOverrides(next) {
     overrides = next;
     await YDR.storage.set({ nbaOptions: overrides });
@@ -210,7 +220,17 @@
     await YDR.nbaPanel.mount({
       onToggleDrafted: toggleDrafted,
       onPlayerClick: searchInYahoo,
-      onOptionChange: (patch) => saveOverrides(YDR.nbaBoard.mergeOverrides(board, overrides, patch)),
+      onOptionChange: async (patch) => {
+        if (patch && 'scoring' in patch) {
+          scoringByDraft = Object.assign({}, scoringByDraft, { [route.draftId]: patch.scoring });
+          await YDR.storage.set({ nbaScoringByDraft: scoringByDraft });
+          const rest = Object.assign({}, patch);
+          delete rest.scoring;
+          if (!Object.keys(rest).length) return render();
+          return saveOverrides(YDR.nbaBoard.mergeOverrides(board, overrides, rest));
+        }
+        return saveOverrides(YDR.nbaBoard.mergeOverrides(board, overrides, patch));
+      },
       onToggleCategory: (cat) => saveOverrides(YDR.nbaBoard.toggleCategory(board, overrides, cat)),
       onSyncChange: async (enabled) => {
         syncEnabled = enabled;

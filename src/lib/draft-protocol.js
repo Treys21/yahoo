@@ -130,14 +130,19 @@ globalThis.YDR = globalThis.YDR || {};
     return order[round % 2 === 1 ? index : n - 1 - index];
   }
 
-  /** Next pick number >= fromPick that belongs to teamId, or null. */
-  function nextPickFor(state, teamId, fromPick, teams) {
+  /**
+   * Next pick number >= fromPick that belongs to teamId, or null.
+   * Before the draft starts there is no order yet; `assumed` (round-one order,
+   * e.g. the team ids in slot order) stands in until Yahoo sends the real one.
+   */
+  function nextPickFor(state, teamId, fromPick, teams, assumed) {
     // The R frame lists the team for every pick, so read it straight off.
     if (state.order.length > teams) {
       for (let p = fromPick; p <= state.order.length; p++) if (state.order[p - 1] === teamId) return p;
       return null;
     }
-    const order = draftOrder(state);
+    let order = draftOrder(state);
+    if (!order.length && assumed) order = assumed;
     if (!teams || order.length !== teams || !order.includes(teamId)) return null;
     for (let p = fromPick; p < fromPick + teams * 2; p++) {
       if (teamForPick(order, p) === teamId) return p;
